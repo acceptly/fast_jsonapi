@@ -143,7 +143,11 @@ module FastJsonapi
         self.transform_method = mapping[transform_name.to_sym]
 
         # ensure that the record type is correctly transformed
-        set_type(reflected_record_type) if reflected_record_type
+        if record_type
+          set_type(record_type)
+        elsif reflected_record_type
+          set_type(reflected_record_type)
+        end
       end
 
       def run_key_transform(input)
@@ -195,7 +199,7 @@ module FastJsonapi
         self.relationships_to_serialize = {} if relationships_to_serialize.nil?
         self.cachable_relationships_to_serialize = {} if cachable_relationships_to_serialize.nil?
         self.uncachable_relationships_to_serialize = {} if uncachable_relationships_to_serialize.nil?
-        
+
         if !relationship.cached
           self.uncachable_relationships_to_serialize[relationship.name] = relationship
         else
@@ -249,7 +253,8 @@ module FastJsonapi
           relationship_type: relationship_type,
           cached: options[:cached],
           polymorphic: fetch_polymorphic_option(options),
-          conditional_proc: options[:if]
+          conditional_proc: options[:if],
+          transform_method: @transform_method
         )
       end
 
